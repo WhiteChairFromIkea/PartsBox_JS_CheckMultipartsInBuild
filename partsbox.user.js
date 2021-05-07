@@ -18,10 +18,10 @@
  * Place button inside button row;
  * Changing button state;
  * Wait until "Part database loaded" message to appear at startup;
- 
+
 0.10 (2021-05-07)
  * Initial commit, no idea how multithreading worksin JS, no error checking at all;
----------------------------------------------------------/*
+---------------------------------------------------------*/
 
 
 (function() {
