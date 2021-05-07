@@ -1,9 +1,11 @@
 // ==UserScript==
 // @name         partsbox
 // @namespace    http://tampermonkey.net/
-// @version      0.1_draft
+// @version      0.1
 // @description  Go to "https://partsbox.com/*/builds/start", refresh page, script button will appear. Rows, having multipart items will be highlighted after script is executed.
 // @author       WhiteChairFromIkea
+// @downloadURL  https://github.com/WhiteChairFromIkea/PartsBox_JS_CheckMultipartsInBuild/raw/main/partsbox.user.js
+// @updateURL    https://github.com/WhiteChairFromIkea/PartsBox_JS_CheckMultipartsInBuild/raw/main/partsbox.user.js
 
 // @include      https://partsbox.com/*/builds/start
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
