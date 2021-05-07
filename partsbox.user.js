@@ -32,7 +32,8 @@
 
 
     $( document ).ready(function() {
-        waitForKeyElements("#message", addBtn); // Wait until "Part database loaded" message appears
+        //waitForKeyElements("#message", addBtn); // Wait until "Part database loaded" message appears
+        waitForKeyElements("div.twelve.wide.field", addBtn);
     });
 
     /*********** End of script script is started by btnUser click event ***************/
@@ -55,6 +56,16 @@
 
         // var buttonHolder = document.body; // Main page
         var buttonHolder = document.querySelector("#app-grid > div:nth-child(3) > div > div > div > div:nth-child(2) > div > div"); //"#app-grid > div:nth-child(3) > div.thirteen.wide.column > div > div > div:nth-child(2) > div > div");
+        if(buttonHolder == null)
+        {
+            buttonHolder = document.querySelector("#app-grid > div:nth-child(2) > div > div > div > div:nth-child(2) > div > div");
+        }
+
+        if(buttonHolder == null)
+        {
+            return;
+        }
+
         buttonHolder.appendChild(btnUser)
 
         btnUser.addEventListener ("click", function() {
