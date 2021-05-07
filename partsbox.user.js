@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         partsbox
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.11
 // @description  Go to "https://partsbox.com/*/builds/start", refresh page, script button will appear. Rows, having multipart items will be highlighted after script is executed.
 // @author       WhiteChairFromIkea
 // @downloadURL  https://github.com/WhiteChairFromIkea/PartsBox_JS_CheckMultipartsInBuild/raw/main/partsbox.user.js
@@ -13,16 +13,33 @@
 // @require  https://gist.github.com/raw/2625891/waitForKeyElements.js
 // @grant    GM_addStyle
 // ==/UserScript==
+/*---------------------Version History--------------------
+0.11 (2021-05-07)
+ * Place button inside button row;
+ * Changing button state;
+ * Wait until "Part database loaded" message to appear at startup;
+ 
+0.10 (2021-05-07)
+ * Initial commit, no idea how multithreading worksin JS, no error checking at all;
+---------------------------------------------------------/*
 
 
 (function() {
     'use strict';
 
+    // Adjust this value according to webpage responsiveness. Default 150 ms
     var TIME_SLOT = 150; // ms for row to expand / colapse / pause
 
-    addBtn();
 
-    /*********** End of script ***************/
+    $( document ).ready(function() {
+        waitForKeyElements("#message", addBtn); // Wait until "Part database loaded" message appears
+    });
+
+    /*********** End of script script is started by btnUser click event ***************/
+
+    var btnUser = document.createElement("Button");
+    var gi_rowCount = 0; // Overall line count, used to calculate job duration
+    var gi_closedTimesCnt = 0;
 
     function addBtn(){
         /*
@@ -33,10 +50,12 @@
         document.head.appendChild(style);
         */
 
-        var btnUser = document.createElement("Button");
-        btnUser.innerHTML = "Check for mutipart items";
-        btnUser.style = "background-color: #6FA521; border-radius: 4px; color: white;  padding: 15px 32px;  text-align: center;  text-decoration: none;  display: inline-block;  font-size: 16px; top:0%;right:50%;position:fixed"
-        document.body.appendChild(btnUser);
+        set_BtnStatus();
+        // btnUser.style = "background-color: #6FA521; border-radius: 4px; color: white;  padding: 15px 32px;  text-align: center;  text-decoration: none;  display: inline-block;  font-size: 16px; top:0%;right:50%;position:fixed"
+
+        // var buttonHolder = document.body; // Main page
+        var buttonHolder = document.querySelector("#app-grid > div:nth-child(3) > div > div > div > div:nth-child(2) > div > div"); //"#app-grid > div:nth-child(3) > div.thirteen.wide.column > div > div > div:nth-child(2) > div > div");
+        buttonHolder.appendChild(btnUser)
 
         btnUser.addEventListener ("click", function() {
             script_checkBuildListForMultipart();
@@ -46,29 +65,31 @@
 
     function script_checkBuildListForMultipart() {
         var arrows = document.querySelectorAll("td.unroll > a"), i;
+        gi_rowCount = arrows.length;
 
-        for(i = 0; i < arrows.length; ++i) {
-            var arrow = arrows[i];
-            //console.log(arrow);
+        if(arrows.length > 0)
+        {
+            set_BtnStatus("Wait untill finished...");
 
-            var wait = (i+1) * TIME_SLOT;
-            setTimeout(openRow, wait, arrow);
-            setTimeout(checRowAndClose, wait + TIME_SLOT, arrow);
-            sleep(TIME_SLOT);
+            for(i = 0; i < arrows.length; i++) {
+                var arrow = arrows[i];
+                //console.log(arrow);
+
+                var wait = (i+1) * TIME_SLOT;
+                setTimeout(openRow, wait, arrow);
+                setTimeout(checRowAndClose, (wait + TIME_SLOT), arrow);
+                sleep(TIME_SLOT);
+            }
         }
     }
 
 
-    //var global2 = 0;
     function openRow(jNode)
     {
-        //    global2++;
-        //    console.log("Opened " + global2 + " time");
         triggerMouseEvent (jNode, "click");
     }
 
 
-    // var global = 0;
     function checRowAndClose(jNode){
         var active = document.querySelector("tr.active");
         var subActive = active.nextElementSibling;
@@ -85,10 +106,33 @@
             active.bgColor = "YELLOW";
         }
 
-        triggerMouseEvent (jNode, "click");
+        gi_closedTimesCnt++;
 
-        //global++;
-        //console.log ("Closed after timeout for " + global + " time");*/
+        if(gi_closedTimesCnt < gi_rowCount )
+        {
+        }
+        else
+        {
+            gi_closedTimesCnt = 0;
+            set_BtnStatus();
+        }
+
+        triggerMouseEvent (jNode, "click");
+    }
+
+    // Pass some text to set as caption, or null to set initial button name
+    function set_BtnStatus(s_isRunning)
+    {
+        if(s_isRunning)
+        {
+            btnUser.disabled = true;
+            btnUser.innerHTML = s_isRunning;
+        }
+        else
+        {
+            btnUser.innerHTML = "Check for mutipart items";
+            btnUser.disabled = false;
+        }
     }
 
 
